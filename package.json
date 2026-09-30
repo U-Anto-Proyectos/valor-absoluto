@@ -1,0 +1,6 @@
+{
+  "name": "valor-absoluto",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node tests/generator.test.mjs 4000" }
+}
