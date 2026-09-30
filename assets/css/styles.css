@@ -51,7 +51,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; border: 0; background: none; padding: 4px; justify-self: start; }
 .mark { font-family: var(--mate); font-size: 17px; background: var(--tinta); color: #fff; border-radius: 10px; padding: 2px 8px 3px; line-height: 1.3; }
-.brand .name { font-weight: 600; font-size: 17px; letter-spacing: -.01em; }
+.brand .name { font-weight: 600; font-size: 17px; letter-spacing: -.01em; white-space: nowrap; }
+.brand .name .by { font-weight: 400; color: var(--tinta-2); }
 .levels { position: relative; display: flex; gap: 2px; padding: 4px; background: var(--hundido); border-radius: 999px; }
 .levels .ind { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: #fff; box-shadow: 0 2px 8px rgba(26,20,10,.10); transition: transform .38s cubic-bezier(.3,1.3,.5,1), width .38s cubic-bezier(.3,1.3,.5,1); }
 .lv { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border: 0; background: none; border-radius: 999px; font-size: 15px; font-weight: 500; color: var(--tinta-2); white-space: nowrap; transition: color .2s; }
@@ -283,9 +284,11 @@ main { position: relative; z-index: 2; padding: 12px 40px calc(var(--scene-h) - 
   .cards { grid-template-columns: repeat(2, 250px); }
   .dock { display: none; }
 }
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   .top { grid-template-columns: 1fr auto; row-gap: 12px; padding: 14px 24px; }
   .levels { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+}
+@media (max-width: 900px) {
   main { padding: 8px 24px calc(var(--scene-h) - 40px); }
   .stats, .scenes { grid-template-columns: repeat(2, 1fr); }
 }
@@ -293,7 +296,8 @@ main { position: relative; z-index: 2; padding: 12px 40px calc(var(--scene-h) - 
 @media (max-width: 600px) {
   :root { --scene-h: 150px; }
   .top { padding: 12px 16px 10px; }
-  .brand .name { display: none; }
+  .brand .name { display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; line-height: 1.2; }
+  .brand .name .by { font-size: 12px; }
   .hud .chip.streak { display: none; }
   .lv { padding: 8px 12px; font-size: 14px; gap: 6px; }
   .lv::before { width: 7px; height: 7px; }
