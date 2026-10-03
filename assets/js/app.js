@@ -142,7 +142,7 @@ function paintExplore() {
   $('#panel').classList.add('is-hidden');
   $('#hintBox').innerHTML = ''; $('#tool').innerHTML = '';
   const compact = matchMedia('(max-width: 600px)').matches;
-  const reach = Math.max(...[ex.explore.center, ...(ex.explore.targets || [])].map(Math.abs), 4) + 1;
+  const reach = Math.max(...[ex.explore.center, ex.explore.target ?? 0, ...(ex.explore.targets || [])].map(Math.abs), 4) + 1;
   const span = compact ? Math.max(6, reach) : 8;
   const nl = createNumberLine({
     ...ex.explore, compact, min: -span, max: span,
