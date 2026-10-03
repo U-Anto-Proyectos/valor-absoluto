@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Valor Absoluto</title>
   <meta name="description" content="Aprende a resolver ecuaciones con valor absoluto construyendo la solución, línea por línea.">
   <meta name="theme-color" content="#F6F3EC">
@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <!-- sin zoom y aviso antes de actualizar; guía con la mano para quien empieza -->
+  <script src="assets/js/guard.js"></script>
+  <script src="assets/js/coach.js"></script>
 </head>
 <body>
   <div class="scene-wrap" id="scene"></div>
@@ -79,5 +82,21 @@
   <div class="toast" id="toast" role="status"></div>
   <div class="sr" id="live" aria-live="assertive"></div>
   <script type="module" src="assets/js/app.js"></script>
+  <script>
+    // aviso antes de actualizar: solo mientras se resuelve un ejercicio
+    window.leaveGuard = function () { return !!document.querySelector('#play.is-on'); };
+    // tutorial: la mano enseña qué tocar o arrastrar (insiste al inicio y luego se retira)
+    Coach.init({
+      key: 'valor-absoluto:coach',
+      color: '#0071E3',
+      groups: [
+        { sel: '#home.is-on .lcard[data-level="desde0"]', single: true, noviceOnly: true, tip: 'Empieza aquí' },
+        { sel: '#play.is-on .explore:not(.is-done) .nl-knob', drag: '#play.is-on .explore:not(.is-done) .nl-goal circle' },
+        { sel: '#play.is-on .explore:not(.is-done) .nline svg', single: true },
+        { sel: '#play.is-on #opts:not(.is-hidden) .opt:not(:disabled)' },
+        { sel: '#play.is-on #done:not(.is-hidden) #nextBtn', single: true }
+      ]
+    });
+  </script>
 </body>
 </html>
