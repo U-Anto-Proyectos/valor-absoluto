@@ -147,6 +147,14 @@ function paintExplore() {
   const nl = createNumberLine({
     ...ex.explore, compact, min: -span, max: span,
     onTry: (v, d) => { if (ex.explore.mode === 'none') brote('pensando', `distancia ${d}`); },
+    onFound: (k, n) => {
+      // se encontró un punto pero faltan otros: decirlo para que no parezca que la web se trabó
+      const falta = n - k;
+      hint.textContent = `¡Bien! Falta ${falta === 1 ? 'otro punto' : falta + ' puntos'} a distancia ${ex.explore.dist}, al otro lado ${ex.explore.center === 0 ? 'del 0' : 'del centro'}`;
+      hint.classList.remove('nudge'); void hint.offsetWidth; hint.classList.add('nudge');
+      brote('feliz', 'Falta otro punto');
+      say(`Correcto. Falta ${falta === 1 ? 'otro punto' : falta + ' puntos'}.`);
+    },
     onDone: () => {
       box.classList.add('is-done');
       hint.textContent = ex.explore.mode === 'none' ? 'Ninguna distancia es negativa' : '¡Eso es! Ahora elige la línea';

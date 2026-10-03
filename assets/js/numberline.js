@@ -2,7 +2,7 @@
 const NS = 'http://www.w3.org/2000/svg';
 const fmt = (v) => String(v).replace('-', '−');
 
-export function createNumberLine({ mode, center = 0, target, dist, targets = [], min = -8, max = 8, compact = false, onDone, onTry }) {
+export function createNumberLine({ mode, center = 0, target, dist, targets = [], min = -8, max = 8, compact = false, onDone, onTry, onFound }) {
   const W = compact ? 440 : 720, H = 150, pad = compact ? 20 : 36, Y = 100;
   const X = (v) => pad + ((v - min) * (W - 2 * pad)) / (max - min);
   const V = (x) => Math.round(min + ((x - pad) * (max - min)) / (W - 2 * pad));
@@ -65,13 +65,16 @@ export function createNumberLine({ mode, center = 0, target, dist, targets = [],
     const hits = el('g', { class: 'nl-hits' });
     for (let v = min; v <= max; v++) {
       const hw = Math.min(16, (X(1) - X(0)) / 2);
-      const r = el('rect', { x: X(v) - hw, y: Y - 26, width: 2 * hw, height: 64, class: 'nl-hit', tabindex: 0, role: 'button', 'aria-label': `Punto ${fmt(v)}` }, hits);
+      const r = el('rect', { x: X(v) - hw, y: Y - 26, width: 2 * hw, height: 64, class: 'nl-hit', tabindex: 0, role: 'button', 'aria-label': `Punto ${fmt(v)}`, 'data-v': v }, hits);
       const act = () => {
         if (done || found.has(v)) return;
         const d = Math.abs(v - center);
         onTry && onTry(v, d);
+        root.dataset.tries = String(Number(root.dataset.tries || 0) + 1);
         if (mode === 'pick' && d === dist) {
           found.add(v);
+          r.classList.add('is-found');
+          if (!targets.every((t) => found.has(t))) onFound && onFound(found.size, targets.length);
           bar(v, 'is-ok', `${d}`);
           el('circle', { cx: X(v), cy: Y, r: 9, class: 'nl-dot is-ok' }, layer);
           if (targets.every((t) => found.has(t))) finish();
@@ -86,8 +89,12 @@ export function createNumberLine({ mode, center = 0, target, dist, targets = [],
       r.addEventListener('click', act);
       r.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); act(); } });
     }
+    // cuántos puntos hay que tocar, dicho con claridad (antes decía «los puntos» y no se sabía que eran dos)
+    const ref = center === 0 ? 'del 0' : `de ${fmt(center)}`;
+    root.dataset.targets = targets.join(' ');
+    root.dataset.center = String(center);
     root.dataset.hint = mode === 'pick'
-      ? (center === 0 ? `Toca los puntos a distancia ${dist} del 0` : `Toca los puntos a distancia ${dist} de ${fmt(center)}`)
+      ? (targets.length > 1 ? `Toca los ${targets.length} puntos que están a distancia ${dist} ${ref}` : `Toca el punto que está a distancia ${dist} ${ref}`)
       : `Busca un punto a distancia ${fmt(dist)} del 0`;
   }
   return root;

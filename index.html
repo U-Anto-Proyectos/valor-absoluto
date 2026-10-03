@@ -86,13 +86,27 @@
     // aviso antes de actualizar: solo mientras se resuelve un ejercicio
     window.leaveGuard = function () { return !!document.querySelector('#play.is-on'); };
     // tutorial: la mano enseña qué tocar o arrastrar (insiste al inicio y luego se retira)
+    // trazos que la mano debe hacer en la recta: desde el centro hasta cada punto que falta
+    function trazosRecta() {
+      var nl = document.querySelector('#play.is-on .explore:not(.is-done) .nline');
+      if (!nl || nl.querySelector('.nl-knob')) return null;
+      var hit = function (v) { return nl.querySelector('.nl-hit[data-v="' + v + '"]'); };
+      var c = hit(Number(nl.dataset.center || 0));
+      var tg = (nl.dataset.targets || '').split(' ').filter(Boolean).map(Number);
+      var falta = tg.filter(function (v) { var h = hit(v); return h && !h.classList.contains('is-found'); });
+      return falta.map(function (v) { return { from: c, to: hit(v) }; });
+    }
     Coach.init({
       key: 'valor-absoluto:coach',
       color: '#0071E3',
       groups: [
         { sel: '#home.is-on .lcard[data-level="desde0"]', single: true, noviceOnly: true, tip: 'Empieza aquí' },
-        { sel: '#play.is-on .explore:not(.is-done) .nl-knob', drag: '#play.is-on .explore:not(.is-done) .nl-goal circle' },
-        { sel: '#play.is-on .explore:not(.is-done) .nline svg', single: true },
+        // arrastrar: la mano lleva el punto desde donde está hasta la meta, por el mismo camino que el dedo
+        { sel: '#play.is-on .explore:not(.is-done) .nl-knob', drag: '#play.is-on .explore:not(.is-done) .nl-goal circle', always: true, delay: 900 },
+        // tocar puntos: la mano hace cada trazo, del centro al punto, y lo toca (si son dos, los dos)
+        { sel: '#play.is-on .explore:not(.is-done) .nline', single: true, sequence: trazosRecta, always: true, delay: 1200 },
+        // jalar el explorador ±: la mano hace el gesto hacia abajo
+        { sel: '#play.is-on #tool .pm-card .pm-handle', dragBy: [0, 70], always: true, delay: 500 },
         { sel: '#play.is-on #opts:not(.is-hidden) .opt:not(:disabled)' },
         { sel: '#play.is-on #done:not(.is-hidden) #nextBtn', single: true }
       ]

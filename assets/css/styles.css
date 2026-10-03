@@ -343,3 +343,8 @@ main { position: relative; z-index: 2; padding: 12px 40px calc(var(--scene-h) - 
   *, *::before, *::after { animation-duration: .15s !important; animation-iteration-count: 1 !important; transition-duration: .15s !important; }
   .scene .clouds, .scene .kite, .dock .brote, .slot::before { animation: none !important; }
 }
+
+/* aviso «falta otro punto» y punto ya encontrado */
+.ex-hint.nudge { animation: hintNudge .5s ease; color: var(--ok-tinta); }
+@keyframes hintNudge { 30% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .ex-hint.nudge { animation: none; } }
