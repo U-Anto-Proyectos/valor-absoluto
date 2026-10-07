@@ -44,7 +44,7 @@
         <h1>Valor Absoluto</h1>
         <p>Construye la solución, línea por línea.</p>
         <div class="cards">
-          <button class="lcard glass" data-level="desde0" style="--c:#3AA7A3"><div class="eqbox">|−5|</div><h3>Desde 0</h3><p>Distancia</p></button>
+          <button class="lcard glass" data-level="desde0" style="--c:#3AA7A3"><div class="eqbox">|−5|</div><h3>Desde 0</h3><p>Primeros pasos</p></button>
           <button class="lcard glass" data-level="facil" style="--c:#2E9E6A"><div class="eqbox">|<i>x</i> + 2| = 5</div><h3>Fácil</h3><p>Dos casos</p></button>
           <button class="lcard glass" data-level="medio" style="--c:#0071E3"><div class="eqbox">|3<i>x</i> − 1| = 8</div><h3>Medio</h3><p>Despejar</p></button>
           <button class="lcard glass" data-level="alto" style="--c:#7A5AF8"><div class="eqbox sm">2|<i>x</i> − 1| + 3 = 11</div><h3>Alto</h3><p>Aislar y razonar</p></button>
@@ -57,7 +57,6 @@
         <article class="sheet glass" id="sheet" aria-label="Resolución">
           <header class="sheet-head"><span class="tag" id="tag"></span><span class="dots" id="dots" aria-hidden="true"></span></header>
           <div class="lines" id="lines" aria-live="polite"></div>
-          <div class="explore is-hidden" id="explore"></div>
           <div class="slot" id="slot" aria-hidden="true">?</div>
         </article>
         <aside class="panel" id="panel" aria-label="Siguiente paso">
@@ -86,25 +85,11 @@
     // aviso antes de actualizar: solo mientras se resuelve un ejercicio
     window.leaveGuard = function () { return !!document.querySelector('#play.is-on'); };
     // tutorial: la mano enseña qué tocar o arrastrar (insiste al inicio y luego se retira)
-    // trazos que la mano debe hacer en la recta: desde el centro hasta cada punto que falta
-    function trazosRecta() {
-      var nl = document.querySelector('#play.is-on .explore:not(.is-done) .nline');
-      if (!nl || nl.querySelector('.nl-knob')) return null;
-      var hit = function (v) { return nl.querySelector('.nl-hit[data-v="' + v + '"]'); };
-      var c = hit(Number(nl.dataset.center || 0));
-      var tg = (nl.dataset.targets || '').split(' ').filter(Boolean).map(Number);
-      var falta = tg.filter(function (v) { var h = hit(v); return h && !h.classList.contains('is-found'); });
-      return falta.map(function (v) { return { from: c, to: hit(v) }; });
-    }
     Coach.init({
       key: 'valor-absoluto:coach',
       color: '#0071E3',
       groups: [
         { sel: '#home.is-on .lcard[data-level="desde0"]', single: true, noviceOnly: true, tip: 'Empieza aquí' },
-        // arrastrar: la mano lleva el punto desde donde está hasta la meta, por el mismo camino que el dedo
-        { sel: '#play.is-on .explore:not(.is-done) .nl-knob', drag: '#play.is-on .explore:not(.is-done) .nl-goal circle', always: true, delay: 900 },
-        // tocar puntos: la mano hace cada trazo, del centro al punto, y lo toca (si son dos, los dos)
-        { sel: '#play.is-on .explore:not(.is-done) .nline', single: true, sequence: trazosRecta, always: true, delay: 1200 },
         // jalar el explorador ±: la mano hace el gesto hacia abajo
         { sel: '#play.is-on #tool .pm-card .pm-handle', dragBy: [0, 70], always: true, delay: 500 },
         { sel: '#play.is-on #opts:not(.is-hidden) .opt:not(:disabled)' },

@@ -34,7 +34,7 @@ const FB = {
   insideSigns: 'Quitar las barras no cambia los signos de adentro.',
   negateAll: 'Al negar, cambian todos los signos.',
   neverNeg: 'Un valor absoluto nunca es negativo.',
-  posOk: 'Un número positivo sí puede ser una distancia.',
+  posOk: 'Un valor absoluto sí puede ser un número positivo.',
   zeroOk: 'Si |A| = 0, entonces A = 0.',
   divideAll: 'Si divides, divide todos los términos.',
   divideNotSub: 'El coeficiente multiplica a x: pasa dividiendo.',
@@ -55,8 +55,8 @@ const FB = {
 };
 const HINT = {
   split: 'Si |A| = k con k > 0: A = k o A = −k.',
-  negative: '¿Puede una distancia ser negativa?',
-  zero: 'Solo el 0 está a distancia 0 del 0.',
+  negative: '¿Puede un valor absoluto ser negativo?',
+  zero: 'Solo |0| vale 0: si |A| = 0, entonces A = 0.',
   collect: 'Agrupa las x en un lado y los números en el otro.',
   transpose: 'Deja sola la x: mueve el número al otro lado.',
   divide: 'Quita el coeficiente de x dividiendo.',
@@ -159,7 +159,7 @@ function splitConst(R, A, k, extraCands = []) {
     const cands = [
       { line: eqsLine(eq(A, K), eq(A, NK)), fb: FB.neverNeg },
       { line: eqsLine(eq(A, NK)), fb: 'No quites el signo: |A| no puede valer ' + plain(k) + '.' },
-      { line: eqsLine(eq(A, K)), fb: 'Ninguna distancia es negativa.' },
+      { line: eqsLine(eq(A, K)), fb: 'Un valor absoluto nunca es negativo.' },
     ];
     const steps = [makeStep(R, noneLine(`|${fmtLin(A)}| nunca es negativo`), cands, { hint: HINT.negative, tool: 'number' })];
     steps.push(makeStep(R, setLine([]), [
@@ -383,7 +383,7 @@ function genAlto(R) {
   return genIsolate(R);
 }
 
-// ---------- Desde 0: exploración guiada ----------
+// ---------- Desde 0: primeros ejercicios, de menos a más ----------
 export const DESDE0_STAGES = ['|k|', '|−k|', '|x| = k', '|x − c| = k', '|x| = −k'];
 function genDesde0(R, stage) {
   const k = R.int(2, 7);
@@ -392,28 +392,28 @@ function genDesde0(R, stage) {
     const lab = `|${fmtNum(v)}|`;
     const st = rawLine(`${lab} = ?`);
     const cands = [
-      { line: rawLine(`${lab} = ${fmtNum(-Math.abs(v))}`), fb: 'Una distancia nunca es negativa.' },
-      { line: rawLine(`${lab} = 0`), fb: `Mide desde 0 hasta ${plain(v)}.` },
+      { line: rawLine(`${lab} = ${fmtNum(-Math.abs(v))}`), fb: 'El valor absoluto nunca es negativo.' },
+      { line: rawLine(`${lab} = 0`), fb: 'Solo |0| vale 0.' },
     ];
-    if (stage === 0) cands.push({ line: rawLine(`${lab} = ${k * 2}`), fb: 'Cuenta los saltos desde 0.' });
-    else cands.push({ line: rawLine(`${lab} = ${k + 1}`), fb: 'Cuenta los saltos desde 0.' });
-    const step = makeStep(R, rawLine(`${lab} = ${k}`), cands, { hint: 'Valor absoluto = distancia al 0.' });
-    return { type: 'distancia', statement: st, steps: [step], solution: null, explore: { mode: 'drag', center: 0, target: v } };
+    if (stage === 0) cands.push({ line: rawLine(`${lab} = ${k * 2}`), fb: 'El número no cambia: solo se quita el signo, si lo tiene.' });
+    else cands.push({ line: rawLine(`${lab} = ${k + 1}`), fb: 'El número no cambia: solo se quita el signo.' });
+    const step = makeStep(R, rawLine(`${lab} = ${k}`), cands, { hint: 'El valor absoluto de un número es ese número sin su signo: nunca es negativo.' });
+    return { type: 'valor absoluto', statement: st, steps: [step], solution: null };
   }
   if (stage === 2) {
     const A = lin(1);
     const body = splitConst(R, A, q(k));
-    return { type: '|x| = k', statement: statementLine(absT(A), lin(0, k)), steps: body.steps, solution: body.sol, explore: { mode: 'pick', center: 0, dist: k, targets: [-k, k] } };
+    return { type: '|x| = k', statement: statementLine(absT(A), lin(0, k)), steps: body.steps, solution: body.sol };
   }
   if (stage === 3) {
     let c = R.nz(-3, 3), kk = R.int(2, 4);
     const A = lin(1, -c);
     const body = splitConst(R, A, q(kk));
-    return { type: '|x − c| = k', statement: statementLine(absT(A), lin(0, kk)), steps: body.steps, solution: body.sol, explore: { mode: 'pick', center: c, dist: kk, targets: [c - kk, c + kk] } };
+    return { type: '|x − c| = k', statement: statementLine(absT(A), lin(0, kk)), steps: body.steps, solution: body.sol };
   }
   const A = lin(1);
   const body = splitConst(R, A, q(-k));
-  return { type: '|x| = −k', statement: statementLine(absT(A), lin(0, -k)), steps: body.steps, solution: body.sol, explore: { mode: 'none', center: 0, dist: -k } };
+  return { type: '|x| = −k', statement: statementLine(absT(A), lin(0, -k)), steps: body.steps, solution: body.sol };
 }
 
 // ---------- API ----------

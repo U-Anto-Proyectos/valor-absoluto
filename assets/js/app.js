@@ -3,7 +3,6 @@ import { generate, DESDE0_STAGES, substSide } from './generator.js';
 import { lineHTML, mathHTML, proseHTML } from './render.js';
 import { solveLine, holds, evalSide, fmtNum, fmtSide, fmtLin, lineText } from './math.js';
 import { broteSVG, landscapeSVG, ICON } from './art.js';
-import { createNumberLine } from './numberline.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -15,7 +14,6 @@ const UNLOCKS = [
   { id: 'rio', name: 'Río', at: 8, c: '#9CC7D6' },
   { id: 'cometa', name: 'Cometa al atardecer', at: 15, c: '#F4C9A0' },
 ];
-const exploreBox = document.getElementById('explore');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- Persistencia (opcional: si el navegador la bloquea, todo sigue funcionando) ----------
@@ -26,7 +24,7 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(S.saved)); } ca
 
 const S = {
   view: 'home', level: 'facil', ex: null, step: 0, lines: [],
-  stepErr: 0, exErr: 0, hints: 0, gain: 0, stepHinted: false, busy: false, explored: true,
+  stepErr: 0, exErr: 0, hints: 0, gain: 0, stepHinted: false, busy: false,
   session: { solved: 0, streak: 0, recent: new Set(), count: { desde0: 0, facil: 0, medio: 0, alto: 0 }, stage: 0 },
   saved: load(),
 };
@@ -97,13 +95,13 @@ function newExercise(immediate) {
   const go = () => {
     const ex = generate(S.level, { recent: S.session.recent, stage: S.session.stage });
     S.session.recent.add(ex.key); if (S.session.recent.size > 40) S.session.recent.delete(S.session.recent.values().next().value);
-    Object.assign(S, { ex, step: 0, lines: [ex.statement], stepErr: 0, exErr: 0, hints: 0, gain: 0, stepHinted: false, busy: false, explored: !ex.explore });
+    Object.assign(S, { ex, step: 0, lines: [ex.statement], stepErr: 0, exErr: 0, hints: 0, gain: 0, stepHinted: false, busy: false });
     paintSheet();
     sheet.classList.remove('leaving'); sheet.classList.add('entering');
     setTimeout(() => sheet.classList.remove('entering'), 400);
     $('#done').classList.add('is-hidden'); $('#done').innerHTML = '';
     for (const id of ['#cap', '#opts', '#foot', '#panel']) $(id).classList.remove('is-hidden');
-    if (S.explored) paintStep(); else paintExplore();
+    paintStep();
     brote('neutral');
   };
   if (immediate || reduced) go(); else { sheet.classList.add('leaving'); setTimeout(go, 280); }
@@ -114,8 +112,7 @@ function paintSheet() {
   $('#tag').textContent = `${LEVELS[S.level].name} · Ejercicio ${S.session.count[S.level] + 1}`;
   const lines = $('#lines'); lines.innerHTML = '';
   S.lines.forEach((l, i) => lines.appendChild(sheetLine(l, i === 0)));
-  if (ex.explore) lines.appendChild(exploreBox); else { exploreBox.classList.add('is-hidden'); exploreBox.innerHTML = ''; }
-  $('#slot').classList.toggle('is-hidden', !S.explored);
+  $('#slot').classList.remove('is-hidden');
   paintDots();
   if (ex.statement.kind === 'raw') lines.firstElementChild.classList.add('raw-q');
 }
@@ -132,44 +129,6 @@ function sheetLine(line, first, isFinal) {
 function paintDots() {
   const n = S.ex.steps.length;
   $('#dots').innerHTML = Array.from({ length: n }, (_, i) => `<i class="${i < S.step ? 'on' : ''}"></i>`).join('');
-}
-
-// Exploración de Desde 0 con recta numérica
-function paintExplore() {
-  const ex = S.ex, box = exploreBox;
-  box.classList.remove('is-hidden', 'is-done'); box.innerHTML = '';
-  for (const id of ['#cap', '#opts', '#foot']) $(id).classList.add('is-hidden');
-  $('#panel').classList.add('is-hidden');
-  $('#hintBox').innerHTML = ''; $('#tool').innerHTML = '';
-  const compact = matchMedia('(max-width: 600px)').matches;
-  const reach = Math.max(...[ex.explore.center, ex.explore.target ?? 0, ...(ex.explore.targets || [])].map(Math.abs), 4) + 1;
-  const span = compact ? Math.max(6, reach) : 8;
-  const nl = createNumberLine({
-    ...ex.explore, compact, min: -span, max: span,
-    onTry: (v, d) => { if (ex.explore.mode === 'none') brote('pensando', `distancia ${d}`); },
-    onFound: (k, n) => {
-      // se encontró un punto pero faltan otros: decirlo para que no parezca que la web se trabó
-      const falta = n - k;
-      hint.textContent = `¡Bien! Falta ${falta === 1 ? 'otro punto' : falta + ' puntos'} a distancia ${ex.explore.dist}, al otro lado ${ex.explore.center === 0 ? 'del 0' : 'del centro'}`;
-      hint.classList.remove('nudge'); void hint.offsetWidth; hint.classList.add('nudge');
-      brote('feliz', 'Falta otro punto');
-      say(`Correcto. Falta ${falta === 1 ? 'otro punto' : falta + ' puntos'}.`);
-    },
-    onDone: () => {
-      box.classList.add('is-done');
-      hint.textContent = ex.explore.mode === 'none' ? 'Ninguna distancia es negativa' : '¡Eso es! Ahora elige la línea';
-      brote('feliz');
-      S.explored = true;
-      $('#panel').classList.remove('is-hidden');
-      $('#slot').classList.remove('is-hidden');
-      for (const id of ['#cap', '#opts', '#foot']) $(id).classList.remove('is-hidden');
-      paintStep();
-      if (matchMedia('(max-width: 1100px)').matches) setTimeout(() => $('#panel').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }), 200);
-    },
-  });
-  const hint = document.createElement('div'); hint.className = 'ex-hint'; hint.textContent = nl.dataset.hint;
-  box.append(nl, hint);
-  brote('pensando', ex.explore.mode === 'drag' ? '¿Qué tan lejos del 0?' : '');
 }
 
 function paintStep() {
@@ -348,7 +307,7 @@ function showPM() {
     setTimeout(() => {
       const legend = `<span class="m">${mathHTML('A = ' + fmtLin(c.L.A))}</span>` + (isConst ? ` y <span class="m">${mathHTML('k = ' + fmtNum(c.R.b))}</span>` : ` y <span class="m">${mathHTML('B = ' + (c.R.k === 'abs' ? fmtLin(c.R.A) : fmtSide(c.R)))}</span>`);
       card.innerHTML = `<div class="pm-split"><div class="pm-case pos"><span class="m">${mathHTML(`A = ${R}`)}</span><small>caso +</small></div><div class="pm-case neg"><span class="m">${mathHTML(`A = −${R}`)}</span><small>caso −</small></div></div>
-        <div class="pm-legend">${isConst ? '<i>A</i> está a distancia <i>k</i> del 0: a la derecha o a la izquierda.' : 'Mismo valor absoluto: iguales u opuestos.'}<br>Aquí ${legend}</div>`;
+        <div class="pm-legend">${isConst ? '<i>A</i> puede valer <i>k</i> o −<i>k</i>: los dos tienen valor absoluto <i>k</i>.' : 'Mismo valor absoluto: iguales u opuestos.'}<br>Aquí ${legend}</div>`;
     }, reduced ? 0 : 260);
   };
   card.addEventListener('pointerdown', (e) => { y0 = e.clientY; card.setPointerCapture(e.pointerId); });

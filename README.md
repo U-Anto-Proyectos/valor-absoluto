@@ -18,7 +18,7 @@ Cada distractor es un **error real**: olvidar el caso negativo, trasponer sin ca
 
 | Nivel | Contenido |
 |---|---|
-| Desde 0 | Distancia en la recta numérica: `|5|`, `|−5|`, `|x| = k`, `|x − c| = k`, `|x| = −k` |
+| Desde 0 | Primeros pasos: `|5|`, `|−5|`, `|x| = k`, `|x − c| = k`, `|x| = −k` |
 | Fácil | `|x| = a`, `|x ± b| = c` (incluye casos sin solución y `= 0`) |
 | Medio | `|ax + b| = c`, coeficientes negativos, soluciones fraccionarias, sin solución |
 | Alto | `a|bx + c| + d = e`, `|A| = |B|`, `|A| = cx + d` (con condición y descarte) |
@@ -45,7 +45,6 @@ assets/js/generator.js   ejercicios, pasos, distractores y retroalimentación
 assets/js/math.js        expresiones, formato y resolución exacta
 assets/js/q.js           números racionales
 assets/js/render.js      marcado matemático → HTML
-assets/js/numberline.js  recta numérica interactiva
 assets/js/art.js         Brote, paisaje e íconos (SVG originales)
 tests/generator.test.mjs
 ```
