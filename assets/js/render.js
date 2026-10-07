@@ -6,7 +6,9 @@ const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>'
 export function mathHTML(markup) {
   let h = esc(markup);
   h = h.replace(/⟦(\d+)\/(\d+)⟧/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+  h = h.replace(/C\.S\./g, '⟪CS⟫'); // «C.S.» va recto, no en cursiva
   h = h.replace(/(^|[^A-Za-zÁ-ú])([xSAk])(?![A-Za-zÁ-ú])/g, '$1<i>$2</i>');
+  h = h.replace(/⟪CS⟫/g, '<span class="cs">C.S.</span>');
   h = h.replace(/ ([=≥≤≠⇒]) /g, '<span class="op">$1</span>');
   return h;
 }

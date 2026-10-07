@@ -55,7 +55,8 @@ export function fmtSide(s) {
 }
 export const fmtEq = (e) => `${fmtSide(e.L)} = ${fmtSide(e.R)}`;
 export function fmtSet(vals) {
-  return vals.length ? `S = {${vals.map(fmtNum).join(', ')}}` : 'S = ∅';
+  // Formato del conjunto solución: C.S. = {2, 3}  (de menor a mayor, coma y espacio)
+  return vals.length ? `C.S. = {${vals.map(fmtNum).join(', ')}}` : 'C.S. = ∅';
 }
 
 // Partes visibles de una línea: [{m: marcado}, ...] + conector

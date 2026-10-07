@@ -116,6 +116,7 @@ main { position: relative; z-index: 2; padding: 12px 40px calc(var(--scene-h) - 
 /* matemática en línea */
 .m { white-space: nowrap; }
 .m i { font-style: italic; }
+.m .cs { font-style: normal; letter-spacing: .01em; }
 .m .op { margin: 0 .28em; }
 .m-text { font-family: var(--ui); font-size: .72em; font-weight: 600; letter-spacing: -.01em; }
 .join { font-family: var(--ui); font-size: .55em; font-weight: 500; color: var(--tinta-3); }

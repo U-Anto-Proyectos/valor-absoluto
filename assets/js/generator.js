@@ -61,7 +61,7 @@ const HINT = {
   transpose: 'Deja sola la x: mueve el número al otro lado.',
   divide: 'Quita el coeficiente de x dividiendo.',
   isolate: 'Antes de abrir casos, deja solo el valor absoluto.',
-  final: 'Reúne en S todas las soluciones válidas.',
+  final: 'Escribe el conjunto solución (C.S.) con todas las soluciones válidas.',
   splitAB: '|A| = |B| significa A = B o A = −B.',
   splitAL: 'Con la condición, |A| = B da A = B o A = −B.',
   cond: 'El lado sin barras debe ser ≥ 0.',
